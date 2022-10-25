@@ -4,7 +4,7 @@ use crate::rdev::{Button, EventType, SimulateError};
 use std::convert::TryInto;
 use std::os::raw::c_int;
 use std::ptr::null;
-use x11::xlib::{self,};
+use x11::xlib::{self};
 use x11::xtest;
 
 unsafe fn send_native(event_type: &EventType, display: *mut xlib::Display) -> Option<()> {
@@ -99,7 +99,7 @@ unsafe fn send_native_char(chr: char, pressed: bool, display: *mut xlib::Display
     } as u64;
 
     // remap keycode to keysym
-    x11::xlib::XChangeKeyboardMapping(display, keycode as _, 1, &mut keysym, 1);
+    x11::xlib::XChangeKeyboardMapping(display, keycode as _, 1, &mut keysym.into(), 1);
 
     let res = if pressed {
         xtest::XTestFakeKeyEvent(display, keycode as _, TRUE, 0)

@@ -12,6 +12,7 @@ use std::{
         mpsc::Sender,
         Arc, Mutex,
     },
+    convert::TryInto,
     time::SystemTime,
 };
 use strum::IntoEnumIterator;
@@ -66,7 +67,7 @@ fn grab_key(display: *mut Display, grab_window: u64, keycode: i32) {
             display,
             keycode,
             AnyModifier,
-            grab_window,
+            grab_window.try_into().unwrap(),
             c_int::from(true),
             GrabModeAsync,
             GrabModeAsync,
@@ -85,7 +86,7 @@ fn grab_keys(display: *mut Display, grab_window: u64) {
 
 fn ungrab_key(display: *mut Display, grab_window: u64, keycode: i32) {
     unsafe {
-        XUngrabKey(display, keycode, AnyModifier, grab_window);
+        XUngrabKey(display, keycode, AnyModifier, grab_window.try_into().unwrap());
     }
 }
 
@@ -115,11 +116,11 @@ fn set_key_hook() {
             let mut x_event: xlib::XEvent = zeroed();
             loop {
                 if IS_GRAB.load(Ordering::SeqCst) {
-                    grab_keys(display, grab_window);
+                    grab_keys(display, grab_window.into());
                     loop {
                         xlib::XNextEvent(display, &mut x_event);
                         if !IS_GRAB.load(Ordering::SeqCst) {
-                            ungrab_keys(display, grab_window);
+                            ungrab_keys(display, grab_window.into());
                             xlib::XNextEvent(display, &mut x_event);
                             break;
                         }

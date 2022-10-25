@@ -96,10 +96,10 @@ unsafe fn send_native_char(chr: char, pressed: bool, display: *mut xlib::Display
         ordinal
     } else {
         ordinal | 0x01000000
-    } as u64;
+    } as u32;
 
     // remap keycode to keysym
-    x11::xlib::XChangeKeyboardMapping(display, keycode as _, 1, &mut keysym.into(), 1);
+    x11::xlib::XChangeKeyboardMapping(display, keycode as _, 1, &mut keysym, 1);
 
     let res = if pressed {
         xtest::XTestFakeKeyEvent(display, keycode as _, TRUE, 0)

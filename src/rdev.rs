@@ -38,9 +38,10 @@ pub enum ListenError {
 /// Errors that occur when trying to grab OS events.
 /// Be careful on Mac, not setting accessibility does not cause an error
 /// it justs ignores events.
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 #[non_exhaustive]
 pub enum GrabError {
+    ListenError,
     /// MacOS
     EventTapError,
     /// MacOS
@@ -55,8 +56,15 @@ pub enum GrabError {
     MouseHookError(u32),
     /// All
     SimulateError,
-    IoError(std::io::Error),
+    // IoError(std::io::Error),
 }
+
+// impl From<std::io::Error> for GrabError {
+//     fn from(err: std::io::Error) -> GrabError {
+//         GrabError::IoError(err)
+//     }
+// }
+
 /// Errors that occur when trying to get display size.
 #[non_exhaustive]
 #[derive(Debug)]
@@ -68,12 +76,6 @@ pub enum DisplayError {
 impl From<SimulateError> for GrabError {
     fn from(_: SimulateError) -> GrabError {
         GrabError::SimulateError
-    }
-}
-
-impl From<std::io::Error> for GrabError {
-    fn from(err: std::io::Error) -> GrabError {
-        GrabError::IoError(err)
     }
 }
 
